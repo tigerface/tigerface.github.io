@@ -1,0 +1,245 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android是怎么加载布局的？ | TigerFace</title>
+  <meta name="author" content="TigerFace">
+  
+  <meta name="description" content="详细描述Android怎么加载出布局">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Android是怎么加载布局的？"/>
+  <meta property="og:site_name" content="TigerFace"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+
+  <link href="/favicon.ico" rel="icon" type="image/x-ico">
+  <link rel="alternate" href="/atom.xml" title="TigerFace" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">TigerFace</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-01-27T10:19:25.000Z"><a href="/2016/01/27/Android是怎么加载布局的？/">2016-01-27</a></time>
+      
+      
+  
+    <h1 class="title">Android是怎么加载布局的？</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>通过这次了解，把Android加载布局的方式彻底了解清楚。</p>
+<a id="more"></a>
+<p><a href="http://grepcode.com" target="_blank" rel="external">Grepcode</a>结合AndroidStudio源码，可以方便我们更好的理解加载过程。</p>
+<p>我们准备从Activity的setContentView方法开始来说（为什么从这个方法开始？）。</p>
+<h2 id="1_u3001Activity_u7684setContentView"><a href="#1_u3001Activity_u7684setContentView" class="headerlink" title="1、Activity的setContentView"></a>1、Activity的setContentView</h2><p>Activity.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContentView</span><span class="params">(<span class="keyword">int</span> layoutResID)</span> </span>&#123;</span><br><span class="line">    getWindow().setContentView(layoutResID);</span><br><span class="line">    initWindowDecorActionBar();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>getWindow()实际上最终是mWindow = PolicyManager.makeNewWindow(this)初始化的，是一个 PhoneWindow 对象。</li>
+<li><p>PolicyManager类创建时（单例模式,只有一个实例），类com.android.internal.policy.impl.Policy随之初始化，PolicyManager.makeNewWindow实际上调用的是Policy的makeNewWindow方法，此为代理模式。该类提供了多种创建对象的方法。从该类名字可以猜测出，创建窗口使用的是策略模式。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">PolicyManager</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String POLICY_IMPL_CLASS_NAME =</span><br><span class="line">        <span class="string">"com.android.internal.policy.impl.Policy"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> IPolicy sPolicy;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="comment">// Pull in the actual implementation of the policy at run-time</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class policyClass = Class.forName(POLICY_IMPL_CLASS_NAME);</span><br><span class="line">            sPolicy = (IPolicy)policyClass.newInstance();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException ex) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                    POLICY_IMPL_CLASS_NAME + <span class="string">" could not be loaded"</span>, ex);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InstantiationException ex) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                    POLICY_IMPL_CLASS_NAME + <span class="string">" could not be instantiated"</span>, ex);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IllegalAccessException ex) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                    POLICY_IMPL_CLASS_NAME + <span class="string">" could not be instantiated"</span>, ex);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Cannot instantiate this class</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">PolicyManager</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"><span class="comment">// The static methods to spawn new policy-specific objects</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Window <span class="title">makeNewWindow</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sPolicy.makeNewWindow(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> LayoutInflater <span class="title">makeNewLayoutInflater</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sPolicy.makeNewLayoutInflater(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> WindowManagerPolicy <span class="title">makeNewWindowManager</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sPolicy.makeNewWindowManager();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> FallbackEventHandler <span class="title">makeNewFallbackEventHandler</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sPolicy.makeNewFallbackEventHandler(context);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>接下来看Policy的makeNewWindow方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Window <span class="title">makeNewWindow</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> PhoneWindow(context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>Activity的 getWindow().setContentView(layoutResID);最终实际上是PhoneWindow调用了setContentView.</p>
+<h2 id="2_u3001PhoneWindow_u7684setContentView"><a href="#2_u3001PhoneWindow_u7684setContentView" class="headerlink" title="2、PhoneWindow的setContentView"></a>2、PhoneWindow的setContentView</h2><p><img src="/img/Activity和Window的简单关系.png" alt=""></p>
+<p>Activity中有一个成员为Window，其实例化对象为PhoneWindow，PhoneWindow为抽象Window类的实现类.</p>
+<p>PhoneWindow.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContentView</span><span class="params">(<span class="keyword">int</span> layoutResID)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// <span class="doctag">Note:</span> FEATURE_CONTENT_TRANSITIONS may be set in the process of installing the window</span></span><br><span class="line">        <span class="comment">// decor, when theme attributes and the like are crystalized. Do not check the feature</span></span><br><span class="line">        <span class="comment">// before this happens.</span></span><br><span class="line">        <span class="keyword">if</span> (mContentParent == <span class="keyword">null</span>) &#123;</span><br><span class="line">            installDecor();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!hasFeature(FEATURE_CONTENT_TRANSITIONS)) &#123;</span><br><span class="line">            mContentParent.removeAllViews();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (hasFeature(FEATURE_CONTENT_TRANSITIONS)) &#123;</span><br><span class="line">            <span class="keyword">final</span> Scene newScene = Scene.getSceneForLayout(mContentParent, layoutResID,</span><br><span class="line">                    getContext());</span><br><span class="line">            transitionTo(newScene);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            mLayoutInflater.inflate(layoutResID, mContentParent);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">final</span> Callback cb = getCallback();</span><br><span class="line">        <span class="keyword">if</span> (cb != <span class="keyword">null</span> &amp;&amp; !isDestroyed()) &#123;</span><br><span class="line">            cb.onContentChanged();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>2.1 初始化decorView，DecorView是FrameLayout的子类，PhoneWindow的内部类。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> ViewGroup <span class="title">generateLayout</span><span class="params">(DecorView decor)</span> </span>&#123;</span><br><span class="line"><span class="comment">// Apply data from current theme.</span></span><br><span class="line">        TypedArray a = getWindowStyle();</span><br><span class="line"><span class="comment">//省略大量类似代码</span></span><br><span class="line"><span class="comment">// Inflate the window decor.</span></span><br><span class="line">        <span class="keyword">int</span> layoutResource;</span><br><span class="line">        <span class="keyword">int</span> features = getLocalFeatures();</span><br><span class="line"><span class="comment">//根据不同的feature调用不同的layout，所以说必须在setContentView之前调用requestFeature</span></span><br><span class="line">    <span class="keyword">if</span> ((features &amp; (<span class="number">1</span> &lt;&lt; FEATURE_SWIPE_TO_DISMISS)) != <span class="number">0</span>) &#123;</span><br><span class="line">            layoutResource = R.layout.screen_swipe_dismiss;</span><br><span class="line">        &#125; <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="comment">//省略其他的判断</span></span><br><span class="line">    &#125;</span><br><span class="line">    View in = mLayoutInflater.inflate(layoutResource, <span class="keyword">null</span>);</span><br><span class="line">    decor.addView(in, <span class="keyword">new</span> ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));</span><br><span class="line">    mContentRoot = (ViewGroup) in;</span><br><span class="line">    ViewGroup contentParent = (ViewGroup)findViewById(ID_ANDROID_CONTENT);</span><br><span class="line">    <span class="comment">//省略其他代码。</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>2.2 mLayoutInflater.inflate(layoutResID, mContentParent);将我们的资源文件通过LayoutInflater对象转换为View树，并且添加至mContentParent视图中（其中mLayoutInflater是在PhoneWindow的构造函数中得到实例对象的LayoutInflater.from(context);）。</li>
+</ul>
+<p>剩下的全部交给LayoutInflater了。下一篇再讲缕清吧。</p>
+<p>参考资料：<br><a href="http://blog.csdn.net/yanbober/article/details/45970721" target="_blank" rel="external"> Android应用setContentView与LayoutInflater加载解析机制源码分析</a><br><a href="http://blog.csdn.net/luoshengyang/article/details/8223770" target="_blank" rel="external">Android应用程序窗口（Activity）的窗口对象（Window）的创建过程分析</a></p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/技术/">技术</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Android/">Android</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+<nav id="pagination" >
+    
+    <a href="/2016/01/27/Android需要深入了解哪些东西？/" class="alignleft prev" >上一頁</a>
+    
+    
+    <a href="/2016/01/27/开发工具汇总/" class="alignright next" >下一頁</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<!-- 多说评论框 start -->
+ <div class="ds-thread" data-thread-key="/2016/01/27/Android是怎么加载布局的？/" data-title="Android是怎么加载布局的？" data-url="http://tigerface.github.io/2016/01/27/Android是怎么加载布局的？/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"tigerface"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+<section id="comment">
+</section>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜尋">
+    <input type="hidden" name="q" value="site:tigerface.github.io">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分類</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/技术/">技术</a><small>2</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">標籤雲</h3>
+  <div class="entry">
+    <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/疑难杂症/" style="font-size: 10px;">疑难杂症</a>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+	<ul class="entry">
+	<li><a href="http://www.github.com/tigerface"   target=_blank title="我的GitHub">我的GitHub</a></li>
+	<li><a href="http://www.weibo.com/mydistiny"    target=_blank title="">我的微博</a></li>
+	<li><a href="http://www.liaoxuefeng.com/"       target=_blank title="git和python教程">廖雪峰</a></li>
+	<li><a href="http://blog.csdn.net/lmj623565791" target=_blank title="">鸿洋csdn</a></li>
+	<li><a href="http://www.liaohuqiu.net"          target=_blank title="土豪Android开发">秋百万</a></li>
+	<li><a href="http://www.trinea.cn"              target=_blank title="trinea"></a></li>
+	<li><a href="http://zmywly8866.github.io"       target=_blank title="">张明云的博客</a></li>
+	<li><a href="http://hukai.me"                   target=_blank title="胡凯"胡凯></a></li>
+	<li><a href="http://drakeet.me"                 target=_blank title="">drakeet</a></li>
+	<li><a href="http://blog.csdn.net/yanbober/article/category/3206943/2"       target=_blank title="">工匠若水</a></li>
+	<li><a href="url: http://droidyue.com"          target=_blank title="">技术小黑屋</a></li>
+	<li><a href="http://toutiao.io"                 target=_blank title="">开发者头条</a></li>
+	<li><a href="http://www.androidweekly.cn"       target=_blank title="">Androidweekly</a></li>
+	<li><a href="http://www.devtf.cn"       		target=_blank title="">开发技术前线</a></li>	
+</ul>
+</div>
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2171653847&verifier=893152b7&dpc=1"></iframe>
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2016 TigerFace
+  
+</div>
+<div class="clearfix"></div>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+</footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+</body>
+</html>
+
+<a href="https://github.com/tigerface"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/82b228a3648bf44fc1163ef44c62fcc60081495e/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png"></a>
