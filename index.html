@@ -66,14 +66,15 @@
 <li>2、 LayoutInflater LayoutInflater =<pre><code>(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 </code></pre></li>
 </ul>
-<p>然而本质上都是一样的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> LayoutInflater <span class="title">from</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        LayoutInflater LayoutInflater =</span><br><span class="line">                (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);</span><br><span class="line">        <span class="keyword">if</span> (LayoutInflater == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">"LayoutInflater not found."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> LayoutInflater;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
-<p>##LayoutInflater.inflate()</p>
-<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function">View <span class="title">inflate</span><span class="params">(<span class="keyword">int</span> resource, ViewGroup root)</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">return</span> <span class="title">inflate</span><span class="params">(resource, root, root != <span class="keyword">null</span>)</span></span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function">View <span class="title">inflate</span><span class="params">(<span class="keyword">int</span> resource, ViewGroup root, <span class="keyword">boolean</span> attachToRoot)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (DEBUG) System.out.println(<span class="string">"INFLATING from resource: "</span> + resource);</span><br><span class="line">        XmlResourceParser parser = getContext().getResources().getLayout(resource);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="function"><span class="keyword">return</span> <span class="title">inflate</span><span class="params">(parser, root, attachToRoot)</span></span>;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            parser.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>然而本质上都是一样的。</p>
       
     </div>
     <footer>
       
+        
+          <div class="alignleft">
+            <a href="/2016/01/28/详解LayoutInfalter-inflate/#more" class="more-link">Read More</a>
+          </div>
         
         
       
