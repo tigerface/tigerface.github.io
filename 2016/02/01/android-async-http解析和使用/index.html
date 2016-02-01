@@ -1,0 +1,282 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>android-async-http解析和使用 | TigerFace</title>
+  <meta name="author" content="TigerFace">
+  
+  <meta name="description" content="loopj/android-async-http github地址官网
+Features
+Make asynchronous HTTP requests, handle responses in anonymous callbacks发送异步http请求，在匿名callback对象中处理response信息；
+HTTP requests happen outside the UI threadhttp请求发生在UI（主）线程之外的异步线程中；
+Requests use a threadpool to cap concurrent resource usage内部采用线程池来处理并发请求；
+GET/POST params builder (RequestParams)通过RequestParams类构造GET/POST，Builder方式。
+Multipart file uploads with no additional third party libraries内置多部分文件上传，不需要第三方库支持；
+Tiny size overhead to your application, only 60kb for everything  和你的app大小相比来说，库的size很小，所有的一切只有90kb；
+Automatic smart request retries optimized for spotty mobile connections在各种各样的移动连接环境中具备自动智能请求重试机制；
+Automatic gzip response decoding support for super-fast requests自动的gzip响应解码
+Optional built-in response parsing into JSON (JsonHttpResponseHandler)内置多种形式的响应解析，有原生的字节流，string，json对象，甚至可以将response写到文件中
+Optional persistent cookie store, saves cookies into your app’s SharedPreferencescookie保存，内部实现用的是Android的SharedPreferences；">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="android-async-http解析和使用"/>
+  <meta property="og:site_name" content="TigerFace"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+
+  <link href="/favicon.ico" rel="icon" type="image/x-ico">
+  <link rel="alternate" href="/atom.xml" title="TigerFace" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">TigerFace</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-02-01T02:52:08.000Z"><a href="/2016/02/01/android-async-http解析和使用/">2016-02-01</a></time>
+      
+      
+  
+    <h1 class="title">android-async-http解析和使用</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p><a href="https://github.com/loopj/android-async-http" target="_blank" rel="external">loopj/android-async-http github地址</a><br><a href="https://loopj.com/android-async-http/" target="_blank" rel="external">官网</a></p>
+<h1 id="Features"><a href="#Features" class="headerlink" title="Features"></a>Features</h1><ul>
+<li>Make asynchronous HTTP requests, handle responses in anonymous callbacks<br>发送异步http请求，在匿名callback对象中处理response信息；</li>
+<li>HTTP requests happen outside the UI thread<br>http请求发生在UI（主）线程之外的异步线程中；</li>
+<li>Requests use a threadpool to cap concurrent resource usage<br>内部采用线程池来处理并发请求；</li>
+<li>GET/POST params builder (RequestParams)<br>通过RequestParams类构造GET/POST，Builder方式。</li>
+<li>Multipart file uploads with no additional third party libraries<br>内置多部分文件上传，不需要第三方库支持；</li>
+<li>Tiny size overhead to your application, only 60kb for everything<br>  和你的app大小相比来说，库的size很小，所有的一切只有90kb；</li>
+<li>Automatic smart request retries optimized for spotty mobile connections<br>在各种各样的移动连接环境中具备自动智能请求重试机制；</li>
+<li>Automatic gzip response decoding support for super-fast requests<br>自动的gzip响应解码</li>
+<li>Optional built-in response parsing into JSON (JsonHttpResponseHandler)<br>内置多种形式的响应解析，有原生的字节流，string，json对象，甚至可以将response写到文件中</li>
+<li>Optional persistent cookie store, saves cookies into your app’s SharedPreferences<br>cookie保存，内部实现用的是Android的SharedPreferences；<a id="more"></a>
+</li>
+</ul>
+<h1 id="AsyncHttpClient__u4F7F_u7528demo"><a href="#AsyncHttpClient__u4F7F_u7528demo" class="headerlink" title="AsyncHttpClient 使用demo"></a>AsyncHttpClient 使用demo</h1><figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">AsyncHttpClient client = <span class="keyword">new</span> AsyncHttpClient();</span><br><span class="line">   client.get(<span class="string">"https://www.google.com"</span>, <span class="keyword">new</span> AsyncHttpResponseHandler() &#123;</span><br><span class="line">       <span class="annotation">@Override</span></span><br><span class="line">       <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(<span class="keyword">int</span> statusCode, Header[] headers, <span class="keyword">byte</span>[] responseBody)</span> </span>&#123;</span><br><span class="line">            System.out.println(response);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="annotation">@Override</span></span><br><span class="line">       <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(<span class="keyword">int</span> statusCode, Header[] headers, <span class="keyword">byte</span>[] responseBody, Throwable</span><br><span class="line">   <span class="keyword">error</span>)</span></span><br><span class="line">   </span>&#123;</span><br><span class="line">            <span class="keyword">error</span>.printStackTrace(System.out);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;);</span><br></pre></td></tr></table></figure>
+<h1 id="u6574_u4F53_u64CD_u4F5C_u6D41_u7A0B"><a href="#u6574_u4F53_u64CD_u4F5C_u6D41_u7A0B" class="headerlink" title="整体操作流程"></a>整体操作流程</h1><p>android-async-http最简单基础的使用只需如下步骤：</p>
+<p>1、创建一个AsyncHttpClient；</p>
+<p>2、（可选的）通过RequestParams对象设置请求参数；</p>
+<p>3、调用AsyncHttpClient的某个get方法，传递你需要的（成功和失败时）callback接口实现，一般都是匿名内部类，实现了AsyncHttpResponseHandler，类库自己也提供许多现成的response handler，你一般不需要自己创建。</p>
+<h1 id="u4E00_u3001_u5148_u521B_u5EFA_u4E00_u4E2AAsyncHttpClient"><a href="#u4E00_u3001_u5148_u521B_u5EFA_u4E00_u4E2AAsyncHttpClient" class="headerlink" title="一、先创建一个AsyncHttpClient"></a>一、先创建一个AsyncHttpClient</h1><p>AsyncHttpClient client = new AsyncHttpClient();</p>
+<ul>
+<li><p>1、创建SchemeRegistry，用于定义支持哪种协议（目前只支持http/https）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> SchemeRegistry <span class="title">getDefaultSchemeRegistry</span><span class="params">(boolean fixNoHttpResponseException, <span class="keyword">int</span> httpPort, <span class="keyword">int</span> httpsPort)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//省略一系列参数判断。</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Fix to SSL flaw in API &lt; ICS</span></span><br><span class="line">    <span class="comment">// See https://code.google.com/p/android/issues/detail?id=13117</span></span><br><span class="line">    SSLSocketFactory sslSocketFactory;</span><br><span class="line">    <span class="keyword">if</span> (fixNoHttpResponseException) &#123;</span><br><span class="line">        sslSocketFactory = MySSLSocketFactory.getFixedSocketFactory();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        sslSocketFactory = SSLSocketFactory.getSocketFactory();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    SchemeRegistry schemeRegistry = <span class="keyword">new</span> SchemeRegistry();</span><br><span class="line">    schemeRegistry.<span class="keyword">register</span>(<span class="keyword">new</span> Scheme(<span class="string">"http"</span>, PlainSocketFactory.getSocketFactory(), httpPort));</span><br><span class="line">    schemeRegistry.<span class="keyword">register</span>(<span class="keyword">new</span> Scheme(<span class="string">"https"</span>, sslSocketFactory, httpsPort));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> schemeRegistry;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2、初始化请求参数BasicHttpParams,添加Header</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">BasicHttpParams httpParams = new BasicHttpParams()<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">ConnManagerParams.setTimeout(httpParams, connectTimeout)<span class="comment">;</span></span><br><span class="line">ConnManagerParams.setMaxConnectionsPerRoute(httpParams, new ConnPerRouteBean(maxConnections))<span class="comment">;</span></span><br><span class="line">ConnManagerParams.setMaxTotalConnections(httpParams, DEFAULT_MAX_CONNECTIONS)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">HttpConnectionParams.setSoTimeout(httpParams, responseTimeout)<span class="comment">;</span></span><br><span class="line">HttpConnectionParams.setConnectionTimeout(httpParams, connectTimeout)<span class="comment">;</span></span><br><span class="line">HttpConnectionParams.setTcpNoDelay(httpParams, true)<span class="comment">;</span></span><br><span class="line">HttpConnectionParams.setSocketBufferSize(httpParams, DEFAULT_SOCKET_BUFFER_SIZE)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li><p>3、根据schemeRegistry 和 httpParams创建连接管理 ClientConnectionManager</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ClientConnectionManager cm = createConnectionManager<span class="list">(<span class="keyword">schemeRegistry</span>, httpParams)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>4、创建线程池</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">threadPool = getDefaultThreadPool()<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>5、根据cm和httpParams创建HttpClient<br>Creates a new HTTP client from parameters and a connection manager.</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">httpClient = new DefaultHttpClient<span class="list">(<span class="keyword">cm</span>, httpParams)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>6、调用httpClient addRequestInterceptor和addResponseInterceptor，设置请求和反馈回调.</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">httpClient.addRequestInterceptor(<span class="keyword">new</span> HttpRequestInterceptor() &#123;</span><br><span class="line">            <span class="annotation">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">(HttpRequest request, HttpContext context)</span> </span>&#123;    <span class="comment">//省略         </span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        httpClient.addResponseInterceptor(<span class="keyword">new</span> HttpResponseInterceptor() &#123;</span><br><span class="line">            <span class="annotation">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">(HttpResponse response, HttpContext context)</span> </span>&#123;</span><br><span class="line">               <span class="comment">//省略 </span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        httpClient.addRequestInterceptor(<span class="keyword">new</span> HttpRequestInterceptor() &#123;</span><br><span class="line">            <span class="annotation">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">process</span><span class="params">(<span class="keyword">final</span> HttpRequest request, <span class="keyword">final</span> HttpContext context)</span> <span class="keyword">throws</span> HttpException, IOException </span>&#123;   </span><br><span class="line">             <span class="comment">//省略             </span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>最后setHttpRequestRetryHandler,设置重试的Handler</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">httpClient.setHttpRequestRetryHandler(<span class="keyword">new</span> RetryHandler(DEFAULT_MAX_RETRIES, DEFAULT_RETRY_SLEEP_TIME_MILLIS));</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="u4E8C_u3001_u901A_u8FC7RequestParams_u5BF9_u8C61_u8BBE_u7F6E_u8BF7_u6C42_u53C2_u6570_uFF1B"><a href="#u4E8C_u3001_u901A_u8FC7RequestParams_u5BF9_u8C61_u8BBE_u7F6E_u8BF7_u6C42_u53C2_u6570_uFF1B" class="headerlink" title="二、通过RequestParams对象设置请求参数；"></a>二、通过RequestParams对象设置请求参数；</h1><p>传入key-value的键值对，作为请求参数</p>
+<h1 id="u4E09_u3001_u8BF7_u6C42"><a href="#u4E09_u3001_u8BF7_u6C42" class="headerlink" title="三、请求"></a>三、请求</h1><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> RequestHandle <span class="title">get</span>(<span class="params">String url, ResponseHandlerInterface responseHandler</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">get</span>(<span class="keyword">null</span>, url, <span class="keyword">null</span>, responseHandler);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> RequestHandle <span class="title">get</span>(<span class="params">Context context, String url, RequestParams <span class="keyword">params</span>, ResponseHandlerInterface responseHandler</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> sendRequest(httpClient, httpContext, <span class="keyword">new</span> HttpGet(getUrlWithQueryString(isUrlEncodingEnabled, url, <span class="keyword">params</span>)), <span class="keyword">null</span>, responseHandler, context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">protected <span class="type">RequestHandle</span> sendRequest(<span class="type">DefaultHttpClient</span> client, <span class="type">HttpContext</span> httpContext, <span class="type">HttpUriRequest</span> uriRequest, <span class="type">String</span> contentType, <span class="type">ResponseHandlerInterface</span> responseHandler, <span class="type">Context</span> context) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (responseHandler.getUseSynchronousMode() &amp;&amp; !responseHandler.getUsePoolThread()) &#123;</span><br><span class="line">            throw new <span class="type">IllegalArgumentException</span>(<span class="string">"Synchronous ResponseHandler used in AsyncHttpClient. You should create your response handler in a looper thread or use SyncHttpClient instead."</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (contentType != null) &#123;</span><br><span class="line">            <span class="keyword">if</span> (uriRequest instanceof <span class="type">HttpEntityEnclosingRequestBase</span> &amp;&amp; ((<span class="type">HttpEntityEnclosingRequestBase</span>) uriRequest).getEntity() != null &amp;&amp; uriRequest.containsHeader(<span class="type">HEADER_CONTENT_TYPE</span>)) &#123;</span><br><span class="line">                log.w(<span class="type">LOG_TAG</span>, <span class="string">"Passed contentType will be ignored because HttpEntity sets content type"</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                uriRequest.setHeader(<span class="type">HEADER_CONTENT_TYPE</span>, contentType);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        responseHandler.setRequestHeaders(uriRequest.getAllHeaders());</span><br><span class="line">        responseHandler.setRequestURI(uriRequest.getURI());</span><br><span class="line"></span><br><span class="line">        //所有的请求处理都在这</span><br><span class="line">        <span class="type">AsyncHttpRequest</span> request = newAsyncHttpRequest(client, httpContext, uriRequest, contentType, responseHandler, context);</span><br><span class="line">        //启用线程池</span><br><span class="line">        threadPool.submit(request);</span><br><span class="line">        //对<span class="type">AsyncHttpRequest</span>进行了<span class="type">WeekReference</span>包装。</span><br><span class="line">        <span class="type">RequestHandle</span> requestHandle = new <span class="type">RequestHandle</span>(request);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (context != null) &#123;</span><br><span class="line">            <span class="type">List</span>&lt;<span class="type">RequestHandle</span>&gt; requestList;</span><br><span class="line">            // <span class="type">Add</span> request to request map</span><br><span class="line">            synchronized (requestMap) &#123;</span><br><span class="line">                requestList = requestMap.get(context);</span><br><span class="line">                <span class="keyword">if</span> (requestList == null) &#123;</span><br><span class="line">                    requestList = <span class="type">Collections</span>.synchronizedList(new <span class="type">LinkedList</span>&lt;<span class="type">RequestHandle</span>&gt;());</span><br><span class="line">                    requestMap.put(context, requestList);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            requestList.add(requestHandle);</span><br><span class="line"></span><br><span class="line">            <span class="type">Iterator</span>&lt;<span class="type">RequestHandle</span>&gt; <span class="keyword">iterator</span> = requestList.<span class="keyword">iterator</span>();</span><br><span class="line">            <span class="keyword">while</span> (<span class="keyword">iterator</span>.hasNext()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">iterator</span>.next().shouldBeGarbageCollected()) &#123;</span><br><span class="line">                    <span class="keyword">iterator</span>.remove();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> requestHandle;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="u6700_u540E_u5B98_u7F51_u63A8_u8350_u4F7F_u7528Static_Http_Client"><a href="#u6700_u540E_u5B98_u7F51_u63A8_u8350_u4F7F_u7528Static_Http_Client" class="headerlink" title="最后官网推荐使用Static Http Client"></a>最后官网推荐使用Static Http Client</h1><p>Recommended Usage: Make a Static Http Client<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">import com.loopj.android.http.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TwitterRestClient</span> &#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> final String BASE_URL = <span class="string">"https://api.twitter.com/1/"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> AsyncHttpClient client = <span class="keyword">new</span> AsyncHttpClient();</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">get</span>(<span class="params">String url, RequestParams <span class="keyword">params</span>, AsyncHttpResponseHandler responseHandler</span>) </span>&#123;</span><br><span class="line">      client.<span class="keyword">get</span>(getAbsoluteUrl(url), <span class="keyword">params</span>, responseHandler);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">post</span>(<span class="params">String url, RequestParams <span class="keyword">params</span>, AsyncHttpResponseHandler responseHandler</span>) </span>&#123;</span><br><span class="line">      client.post(getAbsoluteUrl(url), <span class="keyword">params</span>, responseHandler);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">getAbsoluteUrl</span>(<span class="params">String relativeUrl</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> BASE_URL + relativeUrl;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.json.*;</span><br><span class="line"><span class="keyword">import</span> com.loopj.android.http.*;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TwitterRestClientUsage</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getPublicTimeline</span><span class="params">()</span> <span class="keyword">throws</span> JSONException </span>&#123;</span><br><span class="line">        TwitterRestClient.get(<span class="string">"statuses/public_timeline.json"</span>, <span class="keyword">null</span>, <span class="keyword">new</span> JsonHttpResponseHandler() &#123;</span><br><span class="line">            <span class="annotation">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(<span class="keyword">int</span> statusCode, Header[] headers, JSONObject response)</span> </span>&#123;</span><br><span class="line">                <span class="comment">// If the response is JSONObject instead of expected JSONArray</span></span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="annotation">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(<span class="keyword">int</span> statusCode, Header[] headers, JSONArray timeline)</span> </span>&#123;</span><br><span class="line">                <span class="comment">// Pull out the first event on the public timeline</span></span><br><span class="line">                JSONObject firstEvent = timeline.get(<span class="number">0</span>);</span><br><span class="line">                String tweetText = firstEvent.getString(<span class="string">"text"</span>);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Do something with the response</span></span><br><span class="line">                System.out.println(tweetText);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="u7C7B_u56FE"><a href="#u7C7B_u56FE" class="headerlink" title="类图"></a>类图</h1><p><img src="/img/AsncHttpClient类图.png" alt=""></p>
+<p>#其他的用法见官网</p>
+<ul>
+<li>Persistent Cookie Storage with PersistentCookieStore</li>
+<li>Adding GET/POST Parameters with RequestParams</li>
+<li>Uploading Files with RequestParams</li>
+<li>Downloading Binary Data with FileAsyncHttpResponseHandler</li>
+<li>Adding HTTP Basic Auth credentials</li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        
+        
+  
+  <div class="tags">
+    <a href="/tags/android/">android</a>, <a href="/tags/框架/">框架</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+<nav id="pagination" >
+    
+    
+    <a href="/2016/01/28/Window和WindowManager/" class="alignright next" >下一頁</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<!-- 多说评论框 start -->
+ <div class="ds-thread" data-thread-key="/2016/02/01/android-async-http解析和使用/" data-title="android-async-http解析和使用" data-url="http://tigerface.github.io/2016/02/01/android-async-http解析和使用/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"tigerface"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+<section id="comment">
+</section>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜尋">
+    <input type="hidden" name="q" value="site:tigerface.github.io">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分類</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/技术/">技术</a><small>3</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">標籤雲</h3>
+  <div class="entry">
+    <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/框架/" style="font-size: 10px;">框架</a> <a href="/tags/疑难杂症/" style="font-size: 10px;">疑难杂症</a>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+	<ul class="entry">
+	<li><a href="http://www.github.com/tigerface"   target=_blank title="我的GitHub">我的GitHub</a></li>
+	<li><a href="http://www.weibo.com/mydistiny"    target=_blank title="">我的微博</a></li>
+	<li><a href="http://www.liaoxuefeng.com/"       target=_blank title="git和python教程">廖雪峰</a></li>
+	<li><a href="http://blog.csdn.net/lmj623565791" target=_blank title="">鸿洋csdn</a></li>
+	<li><a href="http://www.liaohuqiu.net"          target=_blank title="土豪Android开发">秋百万</a></li>
+	<li><a href="http://www.trinea.cn"              target=_blank title="trinea"></a></li>
+	<li><a href="http://zmywly8866.github.io"       target=_blank title="">张明云的博客</a></li>
+	<li><a href="http://hukai.me"                   target=_blank title="胡凯"胡凯></a></li>
+	<li><a href="http://drakeet.me"                 target=_blank title="">drakeet</a></li>
+	<li><a href="http://blog.csdn.net/yanbober/article/category/3206943/2"       target=_blank title="">工匠若水</a></li>
+	<li><a href="url: http://droidyue.com"          target=_blank title="">技术小黑屋</a></li>
+	<li><a href="http://toutiao.io"                 target=_blank title="">开发者头条</a></li>
+	<li><a href="http://www.androidweekly.cn"       target=_blank title="">Androidweekly</a></li>
+	<li><a href="http://www.devtf.cn"       		target=_blank title="">开发技术前线</a></li>
+	<li><a href="http://gank.io"       				target=_blank title="">gank.io</a></li>	
+</ul>
+</div>
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2171653847&verifier=893152b7&dpc=1"></iframe>
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2016 TigerFace
+  
+</div>
+<div class="clearfix"></div>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+</footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+</body>
+</html>
+
+<a href="https://github.com/tigerface"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/82b228a3648bf44fc1163ef44c62fcc60081495e/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png"></a>
