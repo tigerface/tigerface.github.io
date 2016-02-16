@@ -108,7 +108,7 @@
     </header>
     <div class="entry">
       
-        <p>windowmanager 使用 demo<br><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">WindowManager mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE)<span class="comment">;</span></span><br><span class="line">           Button mFloatingButton = new Button(this)<span class="comment">;</span></span><br><span class="line">           mFloatingButton.setText("click me")<span class="comment">;</span></span><br><span class="line">           WindowManager.LayoutParams  mLayoutParams = new WindowManager.LayoutParams(</span><br><span class="line">                   LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 0, 0,</span><br><span class="line">                   PixelFormat.TRANSPARENT)<span class="comment">;</span></span><br><span class="line">           mLayoutParams.flags = LayoutParams.FLAG_NOT_TOUCH_MODAL</span><br><span class="line">                   | LayoutParams.FLAG_NOT_FOCUSABLE</span><br><span class="line">                   | LayoutParams.FLAG_SHOW_WHEN_LOCKED<span class="comment">;</span></span><br><span class="line">           mLayoutParams.type = LayoutParams.TYPE_SYSTEM_ERROR<span class="comment">;</span></span><br><span class="line">           mLayoutParams.gravity = Gravity.LEFT | Gravity.TOP<span class="comment">;</span></span><br><span class="line">           mLayoutParams.x = 100<span class="comment">;</span></span><br><span class="line">           mLayoutParams.y = 300<span class="comment">;    </span></span><br><span class="line">           mWindowManager.addView(mFloatingButton, mLayoutParams)<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+        <p>bugly也写了一篇更详细的<br><a href="http://bugly.qq.com/bbs/forum.php?mod=viewthread&amp;tid=555&amp;fromuid=6">浅析Android的窗口</a><br>windowmanager 使用 demo<br><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">WindowManager mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE)<span class="comment">;</span></span><br><span class="line">           Button mFloatingButton = new Button(this)<span class="comment">;</span></span><br><span class="line">           mFloatingButton.setText("click me")<span class="comment">;</span></span><br><span class="line">           WindowManager.LayoutParams  mLayoutParams = new WindowManager.LayoutParams(</span><br><span class="line">                   LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 0, 0,</span><br><span class="line">                   PixelFormat.TRANSPARENT)<span class="comment">;</span></span><br><span class="line">           mLayoutParams.flags = LayoutParams.FLAG_NOT_TOUCH_MODAL</span><br><span class="line">                   | LayoutParams.FLAG_NOT_FOCUSABLE</span><br><span class="line">                   | LayoutParams.FLAG_SHOW_WHEN_LOCKED<span class="comment">;</span></span><br><span class="line">           mLayoutParams.type = LayoutParams.TYPE_SYSTEM_ERROR<span class="comment">;</span></span><br><span class="line">           mLayoutParams.gravity = Gravity.LEFT | Gravity.TOP<span class="comment">;</span></span><br><span class="line">           mLayoutParams.x = 100<span class="comment">;</span></span><br><span class="line">           mLayoutParams.y = 300<span class="comment">;    </span></span><br><span class="line">           mWindowManager.addView(mFloatingButton, mLayoutParams)<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
 <p>注意：小米等手机进行了framework的修改，所以不能正常显示悬浮窗，需要自己去设置中心里面设置允许弹窗。<br>
       
     </div>
@@ -381,14 +381,14 @@
     <aside id="sidebar" class="alignright">
   <div class="search">
   <form action="//google.com/search" method="get" accept-charset="utf-8">
-    <input type="search" name="q" results="0" placeholder="搜尋">
+    <input type="search" name="q" results="0" placeholder="Search">
     <input type="hidden" name="q" value="site:tigerface.github.io">
   </form>
 </div>
 
   
 <div class="widget tag">
-  <h3 class="title">分類</h3>
+  <h3 class="title">Categories</h3>
   <ul class="entry">
   
     <li><a href="/categories/技术/">技术</a><small>3</small></li>
@@ -399,7 +399,7 @@
 
   
 <div class="widget tagcloud">
-  <h3 class="title">標籤雲</h3>
+  <h3 class="title">Tag Cloud</h3>
   <div class="entry">
     <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/框架/" style="font-size: 10px;">框架</a> <a href="/tags/疑难杂症/" style="font-size: 10px;">疑难杂症</a>
   </div>
@@ -424,6 +424,7 @@
 	<li><a href="http://www.androidweekly.cn"       target=_blank title="">Androidweekly</a></li>
 	<li><a href="http://www.devtf.cn"       		target=_blank title="">开发技术前线</a></li>
 	<li><a href="http://gank.io"       				target=_blank title="">gank.io</a></li>	
+	<li><a href="https://github.com/android-cn/android-dev-cn"       				target=_blank title="">android-dev-cn</a></li>	
 </ul>
 </div>
 
