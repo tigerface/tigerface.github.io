@@ -76,8 +76,7 @@
 </li>
 </ul>
 <h1 id="u83B7_u53D6_u72B6_u6001_u680F_u7684_u9AD8_u5EA6"><a href="#u83B7_u53D6_u72B6_u6001_u680F_u7684_u9AD8_u5EA6" class="headerlink" title="获取状态栏的高度"></a>获取状态栏的高度</h1><figure class="highlight sml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Rect</span> frame = new <span class="type">Rect</span><span class="literal">()</span>;</span><br><span class="line">getWindow<span class="literal">()</span>.getDecorView<span class="literal">()</span>.getWindowVisibleDisplayFrame(frame);</span><br><span class="line"><span class="built_in">int</span> statusBarHeight = frame.top;</span><br></pre></td></tr></table></figure>
-<h1 id="u83B7_u53D6_u6807_u9898_u680F_u7684_u9AD8_u5EA6"><a href="#u83B7_u53D6_u6807_u9898_u680F_u7684_u9AD8_u5EA6" class="headerlink" title="获取标题栏的高度"></a>获取标题栏的高度</h1><p>int contentTop = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getTop();<br>//statusBarHeight是上面所求的状态栏的高度<br>int titleBarHeight = contentTop - statusBarHeight; (statusBarHeight见上)</p>
-
+<h1 id="u83B7_u53D6_u6807_u9898_u680F_u7684_u9AD8_u5EA6"><a href="#u83B7_u53D6_u6807_u9898_u680F_u7684_u9AD8_u5EA6" class="headerlink" title="获取标题栏的高度"></a>获取标题栏的高度</h1><figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> contentTop = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getTop();</span><br><span class="line"><span class="comment">//statusBarHeight是上面所求的状态栏的高度</span></span><br><span class="line"><span class="keyword">int</span> titleBarHeight = contentTop - statusBarHeight; (statusBarHeight见上)</span><br></pre></td></tr></table></figure>
       
     </div>
     <footer>
@@ -167,7 +166,7 @@ var duoshuoQuery = {short_name:"tigerface"};
 <div class="widget tagcloud">
   <h3 class="title">標籤雲</h3>
   <div class="entry">
-    <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/框架/" style="font-size: 10px;">框架</a> <a href="/tags/疑难杂症/" style="font-size: 10px;">疑难杂症</a>
+    <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/框架/" style="font-size: 10px;">框架</a> <a href="/tags/疑难杂症/" style="font-size: 10px;">疑难杂症</a>
   </div>
 </div>
 
