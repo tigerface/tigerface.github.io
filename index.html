@@ -51,6 +51,50 @@
     <header>
       
         <div class="icon"></div>
+        <time datetime="2016-02-26T07:21:21.000Z"><a href="/2016/02/26/Android获取Menu的绘制位置、状态栏和标题栏的高度/">2016-02-26</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2016/02/26/Android获取Menu的绘制位置、状态栏和标题栏的高度/">Android获取Menu的绘制位置、状态栏和标题栏的高度</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h1 id="Android_u83B7_u53D6Menu_u7684_u7ED8_u5236_u4F4D_u7F6E"><a href="#Android_u83B7_u53D6Menu_u7684_u7ED8_u5236_u4F4D_u7F6E" class="headerlink" title="Android获取Menu的绘制位置"></a>Android获取Menu的绘制位置</h1><ul>
+<li>第一种方式,使用Compat兼容包，通过setActionView</li>
+</ul>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">onCreateOptionsMenu</span><span class="params">(<span class="keyword">final</span> Menu menu)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.menu = menu;</span><br><span class="line">        MenuInflater inflater = getMenuInflater();  </span><br><span class="line">        inflater.inflate(R.menu.main_activity_actions, menu);  </span><br><span class="line">        <span class="keyword">final</span> ImageView iv = <span class="keyword">new</span> ImageView(<span class="keyword">this</span>);</span><br><span class="line">        iv.setImageResource(R.drawable.home_history_btn_selector);</span><br><span class="line">        MenuItemCompat.setActionView(menu.findItem(R.id.action_history), iv);</span><br></pre></td></tr></table></figure>
+<p>然后通过getActionView获取到图片，进而获取位置</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">View view = MenuItemCompat.getActionView(menu.findItem(R.id.action_history));</span><br><span class="line">                <span class="keyword">if</span>(view == <span class="keyword">null</span>)&#123;</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">int</span> location[] = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">2</span>];</span><br><span class="line">                view.getLocationInWindow(location);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>第二种方式比较简单，因为menu在Android中最终绘制为View，所以可以通过findViewById的方式获取到对应的View.<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(<span class="keyword">new</span> ViewTreeObserver.OnGlobalLayoutListener() &#123;</span><br><span class="line">            @<span class="function">Override</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onGlobalLayout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                View view = findViewById(R.id.action_history);</span><br><span class="line">                <span class="keyword">if</span> (view != null) &#123;</span><br><span class="line">                    <span class="keyword">int</span>[] location = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">2</span>];</span><br><span class="line">                    view.getLocationInWindow(location);</span><br><span class="line">                    Log.d(TAG, <span class="string">"x="</span> + location[<span class="number">0</span>] + <span class="string">" y="</span> + location[<span class="number">1</span>]);</span><br><span class="line">                    getWindow().getDecorView().getViewTreeObserver().removeGlobalOnLayoutListener(<span class="keyword">this</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="u83B7_u53D6_u72B6_u6001_u680F_u7684_u9AD8_u5EA6"><a href="#u83B7_u53D6_u72B6_u6001_u680F_u7684_u9AD8_u5EA6" class="headerlink" title="获取状态栏的高度"></a>获取状态栏的高度</h1><figure class="highlight sml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Rect</span> frame = new <span class="type">Rect</span><span class="literal">()</span>;</span><br><span class="line">getWindow<span class="literal">()</span>.getDecorView<span class="literal">()</span>.getWindowVisibleDisplayFrame(frame);</span><br><span class="line"><span class="built_in">int</span> statusBarHeight = frame.top;</span><br></pre></td></tr></table></figure>
+<h1 id="u83B7_u53D6_u6807_u9898_u680F_u7684_u9AD8_u5EA6"><a href="#u83B7_u53D6_u6807_u9898_u680F_u7684_u9AD8_u5EA6" class="headerlink" title="获取标题栏的高度"></a>获取标题栏的高度</h1><p>int contentTop = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getTop();<br>//statusBarHeight是上面所求的状态栏的高度<br>int titleBarHeight = contentTop - statusBarHeight; (statusBarHeight见上)</p>
+
+      
+    </div>
+    <footer>
+      
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
         <time datetime="2016-02-01T02:52:08.000Z"><a href="/2016/02/01/android-async-http解析和使用/">2016-02-01</a></time>
       
       
@@ -381,14 +425,14 @@
     <aside id="sidebar" class="alignright">
   <div class="search">
   <form action="//google.com/search" method="get" accept-charset="utf-8">
-    <input type="search" name="q" results="0" placeholder="Søk">
+    <input type="search" name="q" results="0" placeholder="搜尋">
     <input type="hidden" name="q" value="site:tigerface.github.io">
   </form>
 </div>
 
   
 <div class="widget tag">
-  <h3 class="title">Kategorier</h3>
+  <h3 class="title">分類</h3>
   <ul class="entry">
   
     <li><a href="/categories/技术/">技术</a><small>3</small></li>
@@ -399,9 +443,9 @@
 
   
 <div class="widget tagcloud">
-  <h3 class="title">Tag Cloud</h3>
+  <h3 class="title">標籤雲</h3>
   <div class="entry">
-    <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/框架/" style="font-size: 10px;">框架</a> <a href="/tags/疑难杂症/" style="font-size: 10px;">疑难杂症</a>
+    <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/框架/" style="font-size: 10px;">框架</a> <a href="/tags/疑难杂症/" style="font-size: 10px;">疑难杂症</a>
   </div>
 </div>
 
@@ -409,6 +453,7 @@
   <div class="widget tag">
 <h3 class="title">友情链接</h3>
 	<ul class="entry">
+	<li><a href="http://104.236.134.90/"       				target=_blank title="">华仔的网站</a></li>	
 	<li><a href="http://www.github.com/tigerface"   target=_blank title="我的GitHub">我的GitHub</a></li>
 	<li><a href="http://www.weibo.com/mydistiny"    target=_blank title="">我的微博</a></li>
 	<li><a href="http://www.liaoxuefeng.com/"       target=_blank title="git和python教程">廖雪峰</a></li>
@@ -423,9 +468,10 @@
 	<li><a href="http://toutiao.io"                 target=_blank title="">开发者头条</a></li>
 	<li><a href="http://www.androidweekly.cn"       target=_blank title="">Androidweekly</a></li>
 	<li><a href="http://www.devtf.cn"       		target=_blank title="">开发技术前线</a></li>
+	<li><a href="http://www.jcodecraeer.com/plus/list.php?tid=16"       				target=_blank title="">泡在网上的日子</a></li>	
 	<li><a href="http://gank.io"       				target=_blank title="">gank.io</a></li>	
 	<li><a href="https://github.com/android-cn/android-dev-cn"       				target=_blank title="">android-dev-cn</a></li>
-	<li><a href="http://104.236.134.90/"       				target=_blank title="">华仔的网站</a></li>	
+		
 </ul>
 </div>
 
