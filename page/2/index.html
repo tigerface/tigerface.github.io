@@ -45,48 +45,6 @@
 </header>
   <div id="content" class="inner">
     <div id="main-col" class="alignleft"><div id="wrapper">
-  <article class="post">
-  
-  <div class="post-content">
-    <header>
-      
-        <div class="icon"></div>
-        <time datetime="2016-01-26T11:45:45.000Z"><a href="/2016/01/26/PopupWindow遇到的坑/">2016-01-26</a></time>
-      
-      
-  
-    <h1 class="title"><a href="/2016/01/26/PopupWindow遇到的坑/">PopupWindow遇到的坑</a></h1>
-  
-
-    </header>
-    <div class="entry">
-      
-        <h3 id="1_u3001PopUpwindow_u51FA_u73B0_u9ED1_u8272_u8FB9_u6846"><a href="#1_u3001PopUpwindow_u51FA_u73B0_u9ED1_u8272_u8FB9_u6846" class="headerlink" title="1、PopUpwindow出现黑色边框"></a>1、PopUpwindow出现黑色边框</h3><ul>
-<li>解决办法<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setBackgroundDrawable<span class="list">(<span class="keyword">null</span>)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="2_u3001popup_u70B9_u51FB_u5916_u90E8_u533A_u57DF_u4E0D_u6D88_u5931"><a href="#2_u3001popup_u70B9_u51FB_u5916_u90E8_u533A_u57DF_u4E0D_u6D88_u5931" class="headerlink" title="2、popup点击外部区域不消失"></a>2、popup点击外部区域不消失</h3><ul>
-<li>解决办法<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">setOutsideTouchable<span class="list">(<span class="keyword">true</span>)</span><span class="comment">;</span></span><br><span class="line">setBackgroundDrawable<span class="list">(<span class="keyword">new</span> BitmapDrawable<span class="list">()</span>)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>绝对不能使用setBackgroundDrawable(null)，坑了好久。。<br>原因待考察，需要看下PopUpwindow源码。</p>
-<p>还没找到原因。。。</p>
-
-      
-    </div>
-    <footer>
-      
-        
-        
-      
-      <div class="clearfix"></div>
-    </footer>
-  </div>
-</article>
-
-
-
-
   <article class="photo">
   
   <div class="post-content">
