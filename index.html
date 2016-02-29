@@ -63,6 +63,19 @@
       
         <p>直接去参考这3个网站，别的直接去Android官网去看吧~<br><a href="http://blog.csdn.net/zhaokaiqiang1992/article/details/45419023#dpdipdpisppx" target="_blank" rel="external">凯子哥总结的Android屏幕适配全攻略(最权威的官方适配指导)</a></p>
 <p><a href="http://blog.csdn.net/coder_nice/article/details/43487013" target="_blank" rel="external">Android 屏幕适配 </a><br><a href="http://hukai.me/android-training-course-in-chinese/basics/supporting-devices/screens.html" target="_blank" rel="external">适配不同的屏幕</a></p>
+<p>总结下：</p>
+<p>mdpi、hdpi、xdpi、xxdpi用来修饰Android中的drawable文件夹及values文件夹，用来区分不同像素密度下的图片和dimen值。<br>那么如何区分呢？Google官方指定按照下列标准进行区分：<br>名称  像素密度范围          dip<br>mdpi    120dpi~160dpi       1.0基准<br>hdpi    160dpi~240dpi       1.5<br>xhdpi   240dpi~320dpi       2.0<br>xxhdpi  320dpi~480dpi       3.0<br>xxxhdpi 480dpi~640dpi       4.0</p>
+<ul>
+<li>1、可以通过使用不同的layout来解决。(但是3.2以下版本不支持sw600dp这种限定符的layout，布局可以使用别名)</li>
+</ul>
+<p>res/values-large/layout.xml:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">item</span> <span class="attribute">name</span>=<span class="value">"main"</span> <span class="attribute">type</span>=<span class="value">"layout"</span>&gt;</span>@layout/main_twopanes<span class="tag">&lt;/<span class="title">item</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">resources</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">item</span> <span class="attribute">name</span>=<span class="value">"main"</span> <span class="attribute">type</span>=<span class="value">"layout"</span>&gt;</span>@layout/main_twopanes<span class="tag">&lt;/<span class="title">item</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>2、巧妙使用weight。</li>
+<li>3、使用9图(9图可以指定内容padding)</li>
+<li>4、使用相对布局，绝对不能使用绝对布局</li>
+<li>5、使用鸿洋的方式，找一个基准，比如320px*480px的2dip的设备，那么我们将一个屏幕宽度的总像素数平均分成320份，每一份对应具体的像素就可以了。</li>
+</ul>
 
       
     </div>
@@ -96,7 +109,24 @@
     <div class="entry">
       
         <p>直接去参考这个网站<br><a href="http://blog.csdn.net/cyp331203/article/details/45071069" target="_blank" rel="external">触摸事件的传递机制</a></p>
+<h1 id="u4E00_u4E9B_u8981_u70B9_uFF1A"><a href="#u4E00_u4E9B_u8981_u70B9_uFF1A" class="headerlink" title="一些要点："></a>一些要点：</h1><pre><code>1、Touch事件是由硬件捕获到触摸后由系统传递给应用的ViewRoot，再由ViewRoot往下一层一层传递.
 
+2、处理过程都是自上而下的分发，可以看成是由布局的“包含”关系，自顶向下的方式
+
+3、事件存在消耗，事件的处理方法都会返回一个boolean值，如果该值为true，则本次事件下发将会被消费掉，而不会继续往下一层传递.
+
+4、Touch事件从ACTION_DOWN开始，也就是按下的这个action开始算起，到ACTION_UP抬起时结束；但是如果在ACTION_DOWN的时候，没有接受事件，那么后续的其他动作也将不会被接受
+
+5、dispatchTouchEvent方法，是用来分发上层传递过来的事件的，它在View和ViewGroup中都有实现
+
+6、onInterceptTouchEvent方法，是用来拦截事件传递的，它只在ViewGroup中有实现，在View中没有
+
+7、view对象的TouchLitener中的onTouch方法总是会先于view自己的onTouchEvent(event)方法被执行，这是由View中的dispatchEvent方法决定。
+
+8、Activity中的onTouchEvent只会在能响应的所有view都响应完事件，且都没有消费掉事件之后才会被调用。
+
+9、如果一个ViewGroup被点击的地方，有多个子View/ViewGroup可以响应点击事件，那么它们响应的顺序是：后addView进来的子view/ViewGroup先响应事件或者是xml布局文件中后被添加的view先 响应触摸事件
+</code></pre>
       
     </div>
     <footer>

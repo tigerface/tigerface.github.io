@@ -6,7 +6,12 @@
   <title>Android事件分发和处理机制 | TigerFace</title>
   <meta name="author" content="TigerFace">
   
-  <meta name="description" content="直接去参考这个网站触摸事件的传递机制">
+  <meta name="description" content="直接去参考这个网站触摸事件的传递机制
+一些要点：1、Touch事件是由硬件捕获到触摸后由系统传递给应用的ViewRoot，再由ViewRoot往下一层一层传递.
+
+2、处理过程都是自上而下的分发，可以看成是由布局的“包含”关系，自顶向下的方式
+
+3、事件存在消耗，事件的处理方法都会返回一个boole">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -63,7 +68,24 @@
     <div class="entry">
       
         <p>直接去参考这个网站<br><a href="http://blog.csdn.net/cyp331203/article/details/45071069" target="_blank" rel="external">触摸事件的传递机制</a></p>
+<h1 id="u4E00_u4E9B_u8981_u70B9_uFF1A"><a href="#u4E00_u4E9B_u8981_u70B9_uFF1A" class="headerlink" title="一些要点："></a>一些要点：</h1><pre><code>1、Touch事件是由硬件捕获到触摸后由系统传递给应用的ViewRoot，再由ViewRoot往下一层一层传递.
 
+2、处理过程都是自上而下的分发，可以看成是由布局的“包含”关系，自顶向下的方式
+
+3、事件存在消耗，事件的处理方法都会返回一个boolean值，如果该值为true，则本次事件下发将会被消费掉，而不会继续往下一层传递.
+
+4、Touch事件从ACTION_DOWN开始，也就是按下的这个action开始算起，到ACTION_UP抬起时结束；但是如果在ACTION_DOWN的时候，没有接受事件，那么后续的其他动作也将不会被接受
+
+5、dispatchTouchEvent方法，是用来分发上层传递过来的事件的，它在View和ViewGroup中都有实现
+
+6、onInterceptTouchEvent方法，是用来拦截事件传递的，它只在ViewGroup中有实现，在View中没有
+
+7、view对象的TouchLitener中的onTouch方法总是会先于view自己的onTouchEvent(event)方法被执行，这是由View中的dispatchEvent方法决定。
+
+8、Activity中的onTouchEvent只会在能响应的所有view都响应完事件，且都没有消费掉事件之后才会被调用。
+
+9、如果一个ViewGroup被点击的地方，有多个子View/ViewGroup可以响应点击事件，那么它们响应的顺序是：后addView进来的子view/ViewGroup先响应事件或者是xml布局文件中后被添加的view先 响应触摸事件
+</code></pre>
       
     </div>
     <footer>

@@ -7,7 +7,9 @@
   <meta name="author" content="TigerFace">
   
   <meta name="description" content="直接去参考这3个网站，别的直接去Android官网去看吧~凯子哥总结的Android屏幕适配全攻略(最权威的官方适配指导)
-Android 屏幕适配 适配不同的屏幕">
+Android 屏幕适配 适配不同的屏幕
+总结下：
+mdpi、hdpi、xdpi、xxdpi用来修饰Android中的drawable文件夹及values文件夹，用来区分不同像">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -65,6 +67,19 @@ Android 屏幕适配 适配不同的屏幕">
       
         <p>直接去参考这3个网站，别的直接去Android官网去看吧~<br><a href="http://blog.csdn.net/zhaokaiqiang1992/article/details/45419023#dpdipdpisppx" target="_blank" rel="external">凯子哥总结的Android屏幕适配全攻略(最权威的官方适配指导)</a></p>
 <p><a href="http://blog.csdn.net/coder_nice/article/details/43487013" target="_blank" rel="external">Android 屏幕适配 </a><br><a href="http://hukai.me/android-training-course-in-chinese/basics/supporting-devices/screens.html" target="_blank" rel="external">适配不同的屏幕</a></p>
+<p>总结下：</p>
+<p>mdpi、hdpi、xdpi、xxdpi用来修饰Android中的drawable文件夹及values文件夹，用来区分不同像素密度下的图片和dimen值。<br>那么如何区分呢？Google官方指定按照下列标准进行区分：<br>名称  像素密度范围          dip<br>mdpi    120dpi~160dpi       1.0基准<br>hdpi    160dpi~240dpi       1.5<br>xhdpi   240dpi~320dpi       2.0<br>xxhdpi  320dpi~480dpi       3.0<br>xxxhdpi 480dpi~640dpi       4.0</p>
+<ul>
+<li>1、可以通过使用不同的layout来解决。(但是3.2以下版本不支持sw600dp这种限定符的layout，布局可以使用别名)</li>
+</ul>
+<p>res/values-large/layout.xml:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">item</span> <span class="attribute">name</span>=<span class="value">"main"</span> <span class="attribute">type</span>=<span class="value">"layout"</span>&gt;</span>@layout/main_twopanes<span class="tag">&lt;/<span class="title">item</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">resources</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">item</span> <span class="attribute">name</span>=<span class="value">"main"</span> <span class="attribute">type</span>=<span class="value">"layout"</span>&gt;</span>@layout/main_twopanes<span class="tag">&lt;/<span class="title">item</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>2、巧妙使用weight。</li>
+<li>3、使用9图(9图可以指定内容padding)</li>
+<li>4、使用相对布局，绝对不能使用绝对布局</li>
+<li>5、使用鸿洋的方式，找一个基准，比如320px*480px的2dip的设备，那么我们将一个屏幕宽度的总像素数平均分成320份，每一份对应具体的像素就可以了。</li>
+</ul>
 
       
     </div>
