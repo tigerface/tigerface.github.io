@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>技术 | TigerFace</title>
+  <title>第 2 頁 | TigerFace</title>
   <meta name="author" content="TigerFace">
   
   
@@ -45,49 +45,93 @@
 </header>
   <div id="content" class="inner">
     <div id="main-col" class="alignleft"><div id="wrapper">
-<h2 class="archive-title category">技术</h2>
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-01-26T11:45:45.000Z"><a href="/2016/01/26/PopupWindow遇到的坑/">2016-01-26</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2016/01/26/PopupWindow遇到的坑/">PopupWindow遇到的坑</a></h1>
+  
 
+    </header>
+    <div class="entry">
+      
+        <h3 id="1_u3001PopUpwindow_u51FA_u73B0_u9ED1_u8272_u8FB9_u6846"><a href="#1_u3001PopUpwindow_u51FA_u73B0_u9ED1_u8272_u8FB9_u6846" class="headerlink" title="1、PopUpwindow出现黑色边框"></a>1、PopUpwindow出现黑色边框</h3><ul>
+<li>解决办法<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setBackgroundDrawable<span class="list">(<span class="keyword">null</span>)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="2_u3001popup_u70B9_u51FB_u5916_u90E8_u533A_u57DF_u4E0D_u6D88_u5931"><a href="#2_u3001popup_u70B9_u51FB_u5916_u90E8_u533A_u57DF_u4E0D_u6D88_u5931" class="headerlink" title="2、popup点击外部区域不消失"></a>2、popup点击外部区域不消失</h3><ul>
+<li>解决办法<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">setOutsideTouchable<span class="list">(<span class="keyword">true</span>)</span><span class="comment">;</span></span><br><span class="line">setBackgroundDrawable<span class="list">(<span class="keyword">new</span> BitmapDrawable<span class="list">()</span>)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>绝对不能使用setBackgroundDrawable(null)，坑了好久。。<br>原因待考察，需要看下PopUpwindow源码。</p>
+<p>还没找到原因。。。</p>
 
-  <div class="archive">
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2016-01-27T10:19:25.000Z"><a href="/2016/01/27/Android是怎么加载布局的？/">2016-01-27</a></time>
-            
-              <h1 class="title"><a href="/2016/01/27/Android是怎么加载布局的？/">Android是怎么加载布局的？</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2016-01-27T08:48:43.000Z"><a href="/2016/01/27/开发工具汇总/">2016-01-27</a></time>
-            
-              <h1 class="title"><a href="/2016/01/27/开发工具汇总/">开发工具汇总</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="photo">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2016-01-26T11:33:57.000Z"><a href="/2016/01/26/用hexo搭建github个人主页/">2016-01-26</a></time>
-            
-              <h1 class="title"><a href="/2016/01/26/用hexo搭建github个人主页/">用hexo搭建github个人主页</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
+      
+    </div>
+    <footer>
+      
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
   </div>
-</div></div>
+</article>
+
+
+
+
+  <article class="photo">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-01-26T11:33:57.000Z"><a href="/2016/01/26/用hexo搭建github个人主页/">2016-01-26</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2016/01/26/用hexo搭建github个人主页/">用hexo搭建github个人主页</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">title: postName <span class="preprocessor">#文章页面上的显示名称，可以任意修改，不会出现在URL中</span></span><br><span class="line">date: <span class="number">2013</span>-<span class="number">12</span>-<span class="number">02</span> <span class="number">15</span>:<span class="number">30</span>:<span class="number">16</span> <span class="preprocessor">#文章生成时间，一般不改，当然也可以任意修改</span></span><br><span class="line">categories: <span class="preprocessor">#文章分类目录，可以为空，注意:后面有个空格</span></span><br><span class="line">tags: <span class="preprocessor">#文章标签，可空，多标签请用格式[tag1,tag2,tag3]，注意:后面有个空格</span></span><br><span class="line">---</span><br><span class="line">这里开始使用markdown格式输入你的正文。</span><br></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">不蒜子统计</span><br><span class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">async</span> <span class="attribute">src</span>=<span class="value">"//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">span</span> <span class="attribute">id</span>=<span class="value">"busuanzi_container_site_pv"</span>&gt;</span>本站总访问量<span class="tag">&lt;<span class="title">span</span> <span class="attribute">id</span>=<span class="value">"busuanzi_value_site_pv"</span>&gt;</span><span class="tag">&lt;/<span class="title">span</span>&gt;</span>次<span class="tag">&lt;/<span class="title">span</span>&gt;</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2016/01/26/用hexo搭建github个人主页/#more" class="more-link">Read More</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+<nav id="pagination">
+  
+    <a href="/" class="alignleft prev">上一頁</a>
+  
+  
+  <div class="clearfix"></div>
+</nav></div></div>
     <aside id="sidebar" class="alignright">
   <div class="search">
   <form action="//google.com/search" method="get" accept-charset="utf-8">
