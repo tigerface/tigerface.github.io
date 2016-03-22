@@ -1,0 +1,266 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Retrofit2使用和解析(一) | TigerFace</title>
+  <meta name="author" content="TigerFace">
+  
+  <meta name="description" content="Retrofit是square公司开源的一个网络访问框架。它将网络请求全部封装起来了，相比较Volley来说更加简单,而且访问接口API更加符合Restful设计。当然Volley也不错哈。Retrofit的代码维护者包括大名鼎鼎的JakeWharton JakeWharton。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Retrofit2使用和解析(一)"/>
+  <meta property="og:site_name" content="TigerFace"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+
+  <link href="/favicon.ico" rel="icon" type="image/x-ico">
+  <link rel="alternate" href="/atom.xml" title="TigerFace" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">TigerFace</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-03-22T09:42:34.000Z"><a href="/2016/03/22/Retrofit2使用和解析(一)/">2016-03-22</a></time>
+      
+      
+  
+    <h1 class="title">Retrofit2使用和解析(一)</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p><a href="https://github.com/square/retrofit" target="_blank" rel="external">Retrofit</a>是<a href="http://square.github.io" target="_blank" rel="external">square</a>公司开源的一个网络访问框架。它将网络请求全部封装起来了，相比较Volley来说更加简单,而且访问接口API更加符合Restful设计。当然Volley也不错哈。Retrofit的代码维护者包括大名鼎鼎的JakeWharton JakeWharton。</p>
+<a id="more"></a>
+<p>这篇文章主要是介绍Retrofit的使用方法。</p>
+<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>Retrofit turns your HTTP API into a Java interface.<br>Retrofit需要我们把接口访问的API都使用接口的形式。（Retrofit会在代码运行时进行检查）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GitHubService</span> </span>&#123;</span><br><span class="line">  <span class="annotation">@GET</span>(<span class="string">"users/&#123;user&#125;/repos"</span>)</span><br><span class="line">  Call&lt;List&lt;Repo&gt;&gt; listRepos(<span class="annotation">@Path</span>(<span class="string">"user"</span>) String user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>The Retrofit class generates an implementation of the GitHubService interface.<br>使用Retrofit Builder辅助生成Retrofit对象，进而（通过代理）创建接口实例。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder()</span><br><span class="line">    .baseUrl(<span class="string">"https://api.github.com/"</span>)</span><br><span class="line">    .build();</span><br><span class="line"></span><br><span class="line">GitHubService service = retrofit.create(GitHubService.class);</span><br></pre></td></tr></table></figure></p>
+<p>Each Call from the created GitHubService can make a synchronous or asynchronous HTTP request to the remote webserver.<br>每次调用service的方法都会创建一个Call对象，通过这个Call对象来进行继续的操作。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Call&lt;List&lt;Repo&gt;&gt; repos = service.listRepos(<span class="string">"octocat"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>Use annotations to describe the HTTP request:</p>
+<ul>
+<li>URL parameter replacement and query parameter support</li>
+<li>Object conversion to request body (e.g., JSON, protocol buffers)</li>
+<li>Multipart request body and file upload</li>
+</ul>
+<h1 id="API_Declaration"><a href="#API_Declaration" class="headerlink" title="API Declaration"></a>API Declaration</h1><p>Annotations on the interface methods and its parameters indicate how a request will be handled.<br>使用Annotations（标注）在接口的方法和参数上用来表明这个请求的处理方式。</p>
+<h2 id="Request_Method"><a href="#Request_Method" class="headerlink" title="Request Method"></a>Request Method</h2><p>Every method must have an HTTP annotation that provides the request method and relative URL. There are five built-in annotations: GET, POST, PUT, DELETE, and HEAD. The relative URL of the resource is specified in the annotation.<br>每个接口的方法必须有一个HTTP annotation，retrofit提供了5个内置的annotations:GET, POST, PUT, DELETE, and HEAD。同时请求的url也必须指定在annotation里。<br><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@GET</span>(<span class="string">"users/list"</span>)</span><br><span class="line"><span class="variable">@GET</span>(<span class="string">"users/list?sort=desc"</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="URL_Manipulation"><a href="#URL_Manipulation" class="headerlink" title="URL Manipulation"></a>URL Manipulation</h2><p>A request URL can be updated dynamically using replacement blocks and parameters on the method. A replacement block is an alphanumeric string surrounded by { and }. A corresponding parameter must be annotated with @Path using the same string.</p>
+<ul>
+<li>请求的url可以使用参数和预留位置（block）来动态更新。需要替换的block使用{}预留位置。参数必须使用@Path和相同的字符串与之对应。<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@GET</span>(<span class="string">"group/&#123;id&#125;/users"</span>)</span><br><span class="line">Call&lt;List&lt;User&gt;&gt; <span class="function">groupList</span>(<span class="variable">@Path</span>(<span class="string">"id"</span>) int groupId);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>比如：<br>service.groupList(100)则访问<br>group/100/users</p>
+<ul>
+<li>Query parameters can also be added.<br>查询的参数也可以添加。<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@GET</span>(<span class="string">"group/&#123;id&#125;/users"</span>)</span><br><span class="line">Call&lt;List&lt;User&gt;&gt; <span class="function">groupList</span>(<span class="variable">@Path</span>(<span class="string">"id"</span>) int groupId, <span class="variable">@Query</span>(<span class="string">"sort"</span>) String sort);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>比如：<br>service.groupList(100,year)则访问<br>group/100/users?sort=year</p>
+<ul>
+<li>For complex query parameter combinations a Map can be used.<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@GET</span>(<span class="string">"group/&#123;id&#125;/users"</span>)</span><br><span class="line">Call&lt;List&lt;User&gt;&gt; <span class="function">groupList</span>(<span class="variable">@Path</span>(<span class="string">"id"</span>) int groupId, <span class="variable">@QueryMap</span> Map&lt;String, String&gt; options);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Request_Body"><a href="#Request_Body" class="headerlink" title="Request Body"></a>Request Body</h2><ul>
+<li>An object can be specified for use as an HTTP request body with the @Body annotation.<br>java对象可以使用@Body指定http请求的body。（这个应该是只有POST/PUT请求才会有的）<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@POST</span>(<span class="string">"users/new"</span>)</span><br><span class="line">Call&lt;User&gt; <span class="function">createUser</span>(<span class="variable">@Body</span> User user);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>The object will also be converted using a converter specified on the Retrofit instance. If no converter is added, only RequestBody can be used.</p>
+<h2 id="Form_Encoded_and_Multipart"><a href="#Form_Encoded_and_Multipart" class="headerlink" title="Form Encoded and Multipart"></a>Form Encoded and Multipart</h2><p>Methods can also be declared to send form-encoded and multipart data.</p>
+<p>Form-encoded data is sent when @FormUrlEncoded is present on the method. Each key-value pair is annotated with @Field containing the name and the object providing the value.<br><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@FormUrlEncoded</span></span><br><span class="line"><span class="variable">@POST</span>(<span class="string">"user/edit"</span>)</span><br><span class="line">Call&lt;User&gt; <span class="function">updateUser</span>(<span class="variable">@Field</span>(<span class="string">"first_name"</span>) String first, <span class="variable">@Field</span>(<span class="string">"last_name"</span>) String last);</span><br></pre></td></tr></table></figure></p>
+<p>Multipart requests are used when @Multipart is present on the method. Parts are declared using the @Part annotation.<br><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@Multipart</span></span><br><span class="line"><span class="variable">@PUT</span>(<span class="string">"user/photo"</span>)</span><br><span class="line">Call&lt;User&gt; <span class="function">updateUser</span>(<span class="variable">@Part</span>(<span class="string">"photo"</span>) RequestBody photo, <span class="variable">@Part</span>(<span class="string">"description"</span>) RequestBody description);</span><br></pre></td></tr></table></figure></p>
+<p>Multipart parts use one of Retrofit’s converters or they can implement RequestBody to handle their own serialization.</p>
+<h2 id="Header_Manipulation"><a href="#Header_Manipulation" class="headerlink" title="Header Manipulation"></a>Header Manipulation</h2><p>You can set static headers for a method using the @Headers annotation.<br><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@Headers</span>(<span class="string">"Cache-Control: max-age=640000"</span>)</span><br><span class="line"><span class="variable">@GET</span>(<span class="string">"widget/list"</span>)</span><br><span class="line">Call&lt;List&lt;Widget&gt;&gt; <span class="function">widgetList</span>();</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@Headers</span>(&#123;</span><br><span class="line">    <span class="string">"Accept: application/vnd.github.v3.full+json"</span>,</span><br><span class="line">    <span class="string">"User-Agent: Retrofit-Sample-App"</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="variable">@GET</span>(<span class="string">"users/&#123;username&#125;"</span>)</span><br><span class="line">Call&lt;User&gt; <span class="function">getUser</span>(<span class="variable">@Path</span>(<span class="string">"username"</span>) String username);</span><br></pre></td></tr></table></figure>
+<p>Note that headers do not overwrite each other. All headers with the same name will be included in the request.</p>
+<p>A request Header can be updated dynamically using the @Header annotation. A corresponding parameter must be provided to the @Header. If the value is null, the header will be omitted. Otherwise, toString will be called on the value, and the result used.<br><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@GET</span>(<span class="string">"user"</span>)</span><br><span class="line">Call&lt;User&gt; <span class="function">getUser</span>(<span class="variable">@Header</span>(<span class="string">"Authorization"</span>) String authorization)</span><br></pre></td></tr></table></figure></p>
+<p>Headers that need to be added to every request can be specified using an OkHttp interceptor. </p>
+<h2 id="Synchronous_vs-_Asynchronous"><a href="#Synchronous_vs-_Asynchronous" class="headerlink" title="Synchronous vs. Asynchronous"></a>Synchronous vs. Asynchronous</h2><p>Call instances can be executed either synchronously or asynchronously. Each instance can only be used once, but calling clone() will create a new instance that can be used.</p>
+<p>Call实例可以同步或异步执行。每个Call实例只能执行一次。可以使用clone()方法创建一个新的可用的实例。</p>
+<p>On Android, callbacks will be executed on the main thread. On the JVM, callbacks will happen on the same thread that executed the HTTP request.</p>
+<h2 id="Retrofit_Configuration"><a href="#Retrofit_Configuration" class="headerlink" title="Retrofit Configuration"></a>Retrofit Configuration</h2><p>Retrofit is the class through which your API interfaces are turned into callable objects. By default, Retrofit will give you sane defaults for your platform but it allows for customization.</p>
+<p>我们可以使用Retrofit来对Retrofit进行访问的配置。</p>
+<h2 id="u6DFB_u52A0gradle_u4F9D_u8D56"><a href="#u6DFB_u52A0gradle_u4F9D_u8D56" class="headerlink" title="添加gradle依赖"></a>添加gradle依赖</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">compile</span> <span class="string">'com.squareup.retrofit2:retrofit:(insert latest version)'</span></span><br></pre></td></tr></table></figure>
+<p>下一篇文章分析下Retrofit的源码。学习一下这个不足20个类的网络库。我们自己在以后写框架的时候也可以借鉴下。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+        
+  
+  <div class="tags">
+    <a href="/tags/android/">android</a>, <a href="/tags/框架/">框架</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+<nav id="pagination" >
+    
+    
+    <a href="/2016/03/17/Volley解析/" class="alignright next" >下一頁</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<!-- 多说评论框 start -->
+ <div class="ds-thread" data-thread-key="/2016/03/22/Retrofit2使用和解析(一)/" data-title="Retrofit2使用和解析(一)" data-url="http://tigerface.github.io/2016/03/22/Retrofit2使用和解析(一)/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"tigerface"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+<section id="comment">
+</section>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜尋">
+    <input type="hidden" name="q" value="site:tigerface.github.io">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分類</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/技术/">技术</a><small>3</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">標籤雲</h3>
+  <div class="entry">
+    <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/框架/" style="font-size: 15px;">框架</a> <a href="/tags/疑难杂症/" style="font-size: 10px;">疑难杂症</a>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+	<ul class="entry">
+	<li><a href="http://104.236.134.90/"       				target=_blank title="">华仔的网站</a></li>	
+	<li><a href="http://www.github.com/tigerface"   target=_blank title="我的GitHub">我的GitHub</a></li>
+	<li><a href="http://www.weibo.com/mydistiny"    target=_blank title="">我的微博</a></li>
+	<li><a href="http://www.liaoxuefeng.com/"       target=_blank title="git和python教程">廖雪峰</a></li>
+	<li><a href="http://blog.csdn.net/lmj623565791" target=_blank title="">鸿洋csdn</a></li>
+	<li><a href="http://www.liaohuqiu.net"          target=_blank title="土豪Android开发">秋百万</a></li>
+	<li><a href="http://www.trinea.cn"              target=_blank title="trinea"></a></li>
+	<li><a href="http://zmywly8866.github.io"       target=_blank title="">张明云的博客</a></li>
+	<li><a href="http://hukai.me"                   target=_blank title="胡凯"胡凯></a></li>
+	<li><a href="http://drakeet.me"                 target=_blank title="">drakeet</a></li>
+	<li><a href="http://blog.csdn.net/yanbober/article/category/3206943/2"       target=_blank title="">工匠若水</a></li>
+	<li><a href="url: http://droidyue.com"          target=_blank title="">技术小黑屋</a></li>
+	<li><a href="http://toutiao.io"                 target=_blank title="">开发者头条</a></li>
+	<li><a href="http://www.androidweekly.cn"       target=_blank title="">Androidweekly</a></li>
+	<li><a href="http://www.devtf.cn"       		target=_blank title="">开发技术前线</a></li>
+	<li><a href="http://www.jcodecraeer.com/plus/list.php?tid=16"       				target=_blank title="">泡在网上的日子</a></li>	
+	<li><a href="http://gank.io"       				target=_blank title="">gank.io</a></li>	
+	<li><a href="https://github.com/android-cn/android-dev-cn"       				target=_blank title="">android-dev-cn</a></li>
+		
+</ul>
+</div>
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2171653847&verifier=893152b7&dpc=1"></iframe>
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2016 TigerFace
+  
+</div>
+<div class="clearfix"></div>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+</footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+</body>
+</html>
+
+<a href="https://github.com/tigerface"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/82b228a3648bf44fc1163ef44c62fcc60081495e/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png"></a>
