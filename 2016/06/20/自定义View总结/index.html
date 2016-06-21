@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>自定义View总结 | TigerFace</title>
+  <meta name="author" content="TigerFace">
+  
+  <meta name="description" content="csdn上有个对Android的View进行总结的系列文章，真的太好了。强烈建议参考文章，原文链接在这，读下View和LinearLayout的源码。
+当然这个文章有个小小缺陷，就是onMeasure会在什么时候调用？我找到这篇文章Android measure过程分析,使用FrameLayout来分析的。
+总结：
+measure调用过程12ViewRootImpl.measureHierarchy()--&amp;gt; performMeasure(childWidthMeasureSpec, childHeightMeasureSpec)View.measure(childWidthMeasureSpec, childHeightMeasureSpec)--&amp;gt;onMeasure(widthMeasureSpec, heightMeasureSpec)--&amp;gt;setMeasuredDimension();
+
+
+而在FrameLayout源码里可以看到measureChildWithMargins是在onMeasure里调用的。
+
+onMeasue1）MeasureSpec：其中高2位代表SpecMode即某种测量模式，低30位为SpecSize代表在该模式下的规格大小. 
+2）在子View的宽高进行测量时（measureChildWithMargins），会使用父View的MeasureSpec、父View已经占据的空间，也就是说父View影响着子View的MeasureSpec的生成。
+3）父布局的MeasureSpec Mode和子布局的尺寸决定了子View的MeasureSpec4）自定义View在重写onMeasure()的过程中要处理View的宽或高为wrap_content的情况，因为如果子View在XML布局文件中对于大小的设置采用wrap_content，那么不管父View的specMode是MeasureSpec.AT_MOST还是MeasureSpec.EXACTLY对于子View而言系统给它设置的specMode都是MeasureSpec.AT_MOST，并且其大小都是parentLeftSize即父View目前剩余的可用空间。这时wrap_content就失去了原本的意义，变成了match_parent一样了.">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="自定义View总结"/>
+  <meta property="og:site_name" content="TigerFace"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+
+  <link href="/favicon.ico" rel="icon" type="image/x-ico">
+  <link rel="alternate" href="/atom.xml" title="TigerFace" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">TigerFace</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-06-20T09:34:34.000Z"><a href="/2016/06/20/自定义View总结/">2016-06-20</a></time>
+      
+      
+  
+    <h1 class="title">自定义View总结</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>csdn上有个对Android的View进行总结的系列文章，真的太好了。强烈建议参考文章，<a href="http://blog.csdn.net/lfdfhl/article/details/51347818" target="_blank" rel="external">原文链接在这</a>，读下View和LinearLayout的源码。</p>
+<p>当然这个文章有个小小缺陷，就是onMeasure会在什么时候调用？我找到这篇文章<a href="http://www.cnblogs.com/xiaoweiz/p/3970150.html" target="_blank" rel="external">Android measure过程分析</a>,使用FrameLayout来分析的。</p>
+<h1 id="u603B_u7ED3_uFF1A"><a href="#u603B_u7ED3_uFF1A" class="headerlink" title="总结："></a>总结：</h1><ul>
+<li>measure调用过程<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ViewRootImpl.measureHierarchy()--&gt; performMeasure(childWidthMeasureSpec, childHeightMeasureSpec)</span><br><span class="line">View.measure(childWidthMeasureSpec, childHeightMeasureSpec)--&gt;onMeasure(widthMeasureSpec, heightMeasureSpec)--&gt;setMeasuredDimension();</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>而在FrameLayout源码里可以看到measureChildWithMargins是在onMeasure里调用的。</p>
+<ul>
+<li><p>onMeasue<br>1）MeasureSpec：<br>其中高2位代表SpecMode即某种测量模式，低30位为SpecSize代表在该模式下的规格大小. </p>
+<p>2）在子View的宽高进行测量时（measureChildWithMargins），会使用父View的MeasureSpec、父View已经占据的空间，也就是说父View影响着子View的MeasureSpec的生成。</p>
+<p>3）父布局的MeasureSpec Mode和子布局的尺寸决定了子View的MeasureSpec<br><img src="http://img.blog.csdn.net/20160510112048981" alt=""><br>4）自定义View在重写onMeasure()的过程中要处理View的宽或高为wrap_content的情况，因为如果子View在XML布局文件中对于大小的设置采用wrap_content，那么不管父View的specMode是MeasureSpec.AT_MOST还是MeasureSpec.EXACTLY对于子View而言系统给它设置的specMode都是MeasureSpec.AT_MOST，并且其大小都是parentLeftSize即父View目前剩余的可用空间。这时wrap_content就失去了原本的意义，变成了match_parent一样了.</p>
+</li>
+</ul>
+<a id="more"></a>
+<ul>
+<li><p>onLayout</p>
+</li>
+<li><p>onDraw<br> Canvas：<br> 1）Canvas必须要一个Bitmap对象来保存像素；自定义View的时候，可以使用onDraw（Canvas canvas）里面的参数来直接使用，如果要自己new一个，则必须要使用带Bitmap的构造方法。<br> 2）canvas的操作</p>
+<pre><code>   canvas.translate 相当于移动了坐标的原点，移动了坐标系
+canvas.rotate 相当于把坐标系旋转了一定角度。
+canvas.clipRect 表示剪裁操作，执行该操作后的绘制将显示在剪裁区域。
+canvas.save和canvas.restore 画布的锁定和恢复到原来的画布层
+</code></pre><p> 3）PorterDuffXfermode<br><img src="http://img.blog.csdn.net/20160517180528876" alt=""><br> 4）Bitmap和Matrix :Matrix所操作的是原图的每个像素点，它和坐标系是没有关系。比如Scale是对每个像素点都进行了缩放.</p>
+<pre><code>在调用set，pre，post时可视为将这些方法插入到一个队列。
+
+  pre表示在队头插入一个方法
+  post表示在队尾插入一个方法
+  set表示清空队列 
+  队列中只保留该set方法，其余的方法都会清除。
+</code></pre><p>  5）Shader:实现图像的渐变效果</p>
+<pre><code> BitmapShader———图像渲染
+LinearGradient——–线性渲染
+RadialGradient——–环形渲染
+SweepGradient——–扫描渲染
+ComposeShader——组合渲染
+</code></pre><p>  6）PathEffect</p>
+<pre><code>canvas.drawPath( )绘制一些简单的路径。PathEffect可以给路径设置一些效果或者样式。
+CornerPathEffect 
+用平滑的方式衔接Path的各部分
+DashPathEffect 
+将Path的线段虚线化
+PathDashPathEffect 
+与DashPathEffect效果类似但需要自定义路径虚线的样式
+DiscretePathEffect 
+离散路径效果
+ComposePathEffect 
+两种样式的组合。先使用第一种效果然后在此基础上应用第二种效果
+SumPathEffect 
+两种样式的叠加。先将两种路径效果叠加起来再作用于Path
+</code></pre></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        
+        
+  
+  <div class="tags">
+    <a href="/tags/android/">android</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+<nav id="pagination" >
+    
+    
+    <a href="/2016/04/27/js和Android交互的几种方式/" class="alignright next" >下一頁</a>
+    
+    <div class="clearfix"></div>
+</nav>
+
+<!-- 多说评论框 start -->
+ <div class="ds-thread" data-thread-key="/2016/06/20/自定义View总结/" data-title="自定义View总结" data-url="http://tigerface.github.io/2016/06/20/自定义View总结/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"tigerface"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共JS代码 end -->
+<section id="comment">
+</section>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="搜尋">
+    <input type="hidden" name="q" value="site:tigerface.github.io">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">分類</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/技术/">技术</a><small>3</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">標籤雲</h3>
+  <div class="entry">
+    <a href="/tags/android/" style="font-size: 20px;">android</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/框架/" style="font-size: 15px;">框架</a> <a href="/tags/疑难杂症/" style="font-size: 10px;">疑难杂症</a>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+<h3 class="title">友情链接</h3>
+	<ul class="entry">
+	<li><a href="http://104.236.134.90/"       				target=_blank title="">华仔的网站</a></li>	
+	<li><a href="http://www.github.com/tigerface"   target=_blank title="我的GitHub">我的GitHub</a></li>
+	<li><a href="http://www.weibo.com/mydistiny"    target=_blank title="">我的微博</a></li>
+	<li><a href="http://www.liaoxuefeng.com/"       target=_blank title="git和python教程">廖雪峰</a></li>
+	<li><a href="http://blog.csdn.net/lmj623565791" target=_blank title="">鸿洋csdn</a></li>
+	<li><a href="http://www.liaohuqiu.net"          target=_blank title="土豪Android开发">秋百万</a></li>
+	<li><a href="http://www.trinea.cn"              target=_blank title="trinea"></a></li>
+	<li><a href="http://zmywly8866.github.io"       target=_blank title="">张明云的博客</a></li>
+	<li><a href="http://hukai.me"                   target=_blank title="胡凯"胡凯></a></li>
+	<li><a href="http://drakeet.me"                 target=_blank title="">drakeet</a></li>
+	<li><a href="http://blog.csdn.net/yanbober/article/category/3206943/2"       target=_blank title="">工匠若水</a></li>
+	<li><a href="url: http://droidyue.com"          target=_blank title="">技术小黑屋</a></li>
+	<li><a href="http://toutiao.io"                 target=_blank title="">开发者头条</a></li>
+	<li><a href="http://www.androidweekly.cn"       target=_blank title="">Androidweekly</a></li>
+	<li><a href="http://www.devtf.cn"       		target=_blank title="">开发技术前线</a></li>
+	<li><a href="http://www.jcodecraeer.com/plus/list.php?tid=16"       				target=_blank title="">泡在网上的日子</a></li>	
+	<li><a href="http://gank.io"       				target=_blank title="">gank.io</a></li>	
+	<li><a href="https://github.com/android-cn/android-dev-cn"       				target=_blank title="">android-dev-cn</a></li>
+		
+</ul>
+</div>
+
+  <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=1&ptype=1&speed=0&skin=5&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2171653847&verifier=893152b7&dpc=1"></iframe>
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2016 TigerFace
+  
+</div>
+<div class="clearfix"></div>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+</footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+</body>
+</html>
+
+<a href="https://github.com/tigerface"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/82b228a3648bf44fc1163ef44c62fcc60081495e/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png"></a>
